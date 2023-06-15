@@ -3,6 +3,7 @@ package com.ludo.Snake.and.Ladder.service
 import com.ludo.Snake.and.Ladder.Constants
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
+import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.model.PlayerDto
@@ -48,35 +49,54 @@ class PlayerService {
         return Either.right(playerResponse)
     }
 
-    def joinPlayer(String gameId, String playerId, String emailId) {
+    def joinPlayer(JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
-        Optional<GameConfiguration> gameConfiguration = gameConfigurationRepository.findByIdAndGameState(gameId, Constants.GameState.JOIN)
-        Optional<Player> player = playerRepository.findById(playerId)
-        if(player.isEmpty()) {
-            player = playerRepository.findByEmailId(emailId)
+        String emailId = joinPlayerReq.emailId
+        String gameId = joinPlayerReq.gameId
+
+        Optional<GameConfiguration> OptionalGameConfiguration = gameConfigurationRepository.findById(gameId)
+
+        Optional<Player> OptionalPlayer = playerRepository.findByEmailId(emailId)
+        if(OptionalPlayer.isEmpty()) {
+            log.info("Player not found with email id: ${emailId}")
+            return Either.left(new GenericErrorResponse(status: 404, reason: "EmailId not Found"))
         }
-        if(gameConfiguration.isEmpty()) {
-            log.info("[${className}][joinPlayer][Exit]")
+        if(OptionalGameConfiguration.isEmpty()) {
+            log.info("gameid ${gameId} not present. No game configuration found.")
             return Either.left(new GenericErrorResponse(status: 404, reason: "Game not Found"))
         }
-        if(player.isEmpty()){
-            log.info("[${className}][joinPlayer][Exit]")
-            return Either.left(new GenericErrorResponse(status: 404, reason: "Player Not Found"))
-        }
-        Optional<PlayerBox> playerBox = gameConfiguration.get().board.playerBoxes.findById(playerId)
-        if(!playerBox.isEmpty()) {
-            log.info("[${className}][joinPlayer][Exit]")
+
+        GameConfiguration gameConfiguration = OptionalGameConfiguration.get()
+
+        Player player = OptionalPlayer.get()
+        List<PlayerBox> playerBoxes = gameConfiguration.board.playerBoxes
+
+        boolean playerAvailable = playerBoxes.stream().filter {player.pid.equals(it.getPid())}.findAny().orElse(null)
+        if(playerAvailable) {
+            log.info("Player ${player.pid} already joined game.")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Player Already Joined"))
         }
 
+        if(playerBoxes.size() == gameConfiguration.playerCount) {
+            log.info("Maximum limit reached PlayerCount: ${gameConfiguration.playerCount} ")
+            return Either.left(new GenericErrorResponse(status: 400, reason: "Max Player Reached"))
+        }
+
+        if(gameConfiguration.gameState != Constants.GameState.JOIN) {
+            log.info("Game id ${gameId} is not in Join State")
+            return Either.left(new GenericErrorResponse(status: 400, reason: "Game is not in Join State"))
+        }
+
         PlayerBox newPlayerBox = new PlayerBox().tap {
-            pid = playerId
+            pid = player.pid
             position = 0
         }
+
         try {
-            gameConfiguration.get().board.playerBoxes.add(newPlayerBox)
+            gameConfiguration.board.playerBoxes.add(newPlayerBox)
+            gameConfigurationRepository.save(gameConfiguration)
         } catch(Exception ex) {
-            log.info("[${className}][joinPlayer][Exit]")
+            log.info("Exception occurred while add player in game. Exception: ${ex.getLocalizedMessage()}")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Player Not Added"))
         }
 

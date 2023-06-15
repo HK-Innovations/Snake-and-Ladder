@@ -1,6 +1,7 @@
 package com.ludo.Snake.and.Ladder.controller
 
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
+import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.model.PlayerDto
@@ -39,15 +40,15 @@ class PlayerController {
     }
 
     @PostMapping("/join")
-    def joinPlayer(@RequestParam String gameId, @RequestParam @Nullable String playerId, @RequestParam String emailId) {
+    def joinPlayer(@RequestBody JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
-        Either<GenericErrorResponse, PlayerBox> response = playerService.joinPlayer(gameId, playerId, emailId)
-        if(response.isLeft()) {
+        Either<GenericErrorResponse, PlayerBox> joinResponse = playerService.joinPlayer(joinPlayerReq)
+        if(joinResponse.isLeft()) {
             log.info("[${className}][joinPlayer][Exit]")
-            return response.getLeft()
+            return joinResponse.getLeft()
         }
 
         log.info("[${className}][joinPlayer][Exit]")
-        return response.get()
+        return joinResponse.get()
     }
 }
