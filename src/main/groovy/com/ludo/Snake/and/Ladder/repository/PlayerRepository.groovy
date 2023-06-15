@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PlayerRepository extends JpaRepository<Player, String>{
-
+    Optional<Player> findByEmailId(String emailId)
 }
