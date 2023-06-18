@@ -1,6 +1,7 @@
 package com.ludo.Snake.and.Ladder.controller
 
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
+import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
@@ -50,5 +51,20 @@ class PlayerController {
 
         log.info("[${className}][joinPlayer][Exit]")
         return joinResponse.get()
+    }
+
+    @PostMapping("/login")
+    def login(@RequestBody Map<String, Object> request) {
+        log.info("[${className}][login][Enter]")
+        String emailId = request.emailId
+        String password = request.password
+        Either<GenericErrorResponse, GenericSuccessResponse> loginResponse = playerService.login(emailId,password)
+        if(loginResponse.isLeft()) {
+            log.info("[${className}][login][Exit]")
+            return loginResponse.getLeft()
+        }
+
+        log.info("[${className}][login][Exit]")
+        return loginResponse.get()
     }
 }

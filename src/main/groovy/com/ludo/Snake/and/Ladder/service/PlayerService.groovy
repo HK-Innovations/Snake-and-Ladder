@@ -3,6 +3,7 @@ package com.ludo.Snake.and.Ladder.service
 import com.ludo.Snake.and.Ladder.Constants
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
+import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
@@ -42,14 +43,14 @@ class PlayerService {
         try {
            playerResponse = playerRepository.save(player)
         } catch (Exception ex) {
-            log.info("Exception occurred while saving player details", ex)
+            log.error("Exception occurred while saving player details", ex)
             return Either.left(new GenericErrorResponse(status: 404, reason: "Exception occurred while saving player details: ${ex.getLocalizedMessage()}"))
         }
         log.info("Player created with playerId: ${player.pid}")
         return Either.right(playerResponse)
     }
 
-    def joinPlayer(JoinPlayer joinPlayerReq) {
+    Either<GenericErrorResponse, PlayerBox> joinPlayer(JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
         String emailId = joinPlayerReq.emailId
         String gameId = joinPlayerReq.gameId
@@ -58,11 +59,11 @@ class PlayerService {
 
         Optional<Player> OptionalPlayer = playerRepository.findByEmailId(emailId)
         if(OptionalPlayer.isEmpty()) {
-            log.info("Player not found with email id: ${emailId}")
+            log.error("Player not found with email id: ${emailId}")
             return Either.left(new GenericErrorResponse(status: 404, reason: "EmailId not Found"))
         }
         if(OptionalGameConfiguration.isEmpty()) {
-            log.info("gameid ${gameId} not present. No game configuration found.")
+            log.error("gameid ${gameId} not present. No game configuration found.")
             return Either.left(new GenericErrorResponse(status: 404, reason: "Game not Found"))
         }
 
@@ -73,17 +74,17 @@ class PlayerService {
 
         boolean playerAvailable = playerBoxes.stream().filter {player.pid.equals(it.getPid())}.findAny().orElse(null)
         if(playerAvailable) {
-            log.info("Player ${player.pid} already joined game.")
+            log.error("Player ${player.pid} already joined game.")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Player Already Joined"))
         }
 
         if(playerBoxes.size() == gameConfiguration.playerCount) {
-            log.info("Maximum limit reached PlayerCount: ${gameConfiguration.playerCount} ")
+            log.error("Maximum limit reached PlayerCount: ${gameConfiguration.playerCount} ")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Max Player Reached"))
         }
 
         if(gameConfiguration.gameState != Constants.GameState.JOIN) {
-            log.info("Game id ${gameId} is not in Join State")
+            log.error("Game id ${gameId} is not in Join State")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Game is not in Join State"))
         }
 
@@ -96,11 +97,29 @@ class PlayerService {
             gameConfiguration.board.playerBoxes.add(newPlayerBox)
             gameConfigurationRepository.save(gameConfiguration)
         } catch(Exception ex) {
-            log.info("Exception occurred while add player in game. Exception: ${ex.getLocalizedMessage()}")
+            log.error("Exception occurred while add player in game. Exception: ${ex.getLocalizedMessage()}")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Player Not Added"))
         }
 
         log.info("[${className}][joinPlayer][Exit]")
         return Either.right(newPlayerBox)
     }
+
+    Either<GenericErrorResponse, GenericSuccessResponse> login(String emailId, String password) {
+        log.info("[${className}][login][Enter]")
+        Optional<Player> optionalPlayer = playerRepository.findByEmailId(emailId)
+        if(optionalPlayer.isEmpty()) {
+            log.error("Player not found with email: ${emailId}")
+            return Either.left(new GenericErrorResponse(status: 404, reason: "EmailId not found"))
+        }
+        Player player = optionalPlayer.get()
+        if(player.password != password) {
+            log.error("Unable to login Password did not match")
+            return Either.left(new GenericErrorResponse(status: 404, reason: "Wrong password"))
+        }
+        log.info("Player successfully validated.")
+        log.info("[${className}][login][Exit]")
+        return Either.right(new GenericSuccessResponse(status: 200, reason: "Login Successfully"))
+    }
+
 }
