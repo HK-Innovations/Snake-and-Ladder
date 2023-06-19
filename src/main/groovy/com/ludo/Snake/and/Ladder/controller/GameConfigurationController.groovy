@@ -57,4 +57,9 @@ class GameConfigurationController {
         log.info("[${className}][getGameConfiguration][Exit]")
         return response.get()
     }
+
+    @GetMapping("/startGame")
+    def startGame() {
+
+    }
 }
