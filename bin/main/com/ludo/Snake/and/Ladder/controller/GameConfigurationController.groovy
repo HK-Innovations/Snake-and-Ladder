@@ -58,11 +58,8 @@ class GameConfigurationController {
         return response.get()
     }
 
-    @GetMapping("/nextTurn")
-    def nextTurn(@RequestBody Map<String, Object> turnRequest) {
-        log.info("[${className}][nextTurn][Enter]")
-        def response = gameConfigurationService.nextTurn(turnRequest)
+    @GetMapping("/startGame")
+    def startGame() {
 
-        log.info("[${className}][nextTurn][Exit]")
     }
 }
