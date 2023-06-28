@@ -5,15 +5,11 @@ import com.ludo.Snake.and.Ladder.model.Dice
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.model.GameConfigurationDto
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
-import com.ludo.Snake.and.Ladder.model.PlayerDto
 import com.ludo.Snake.and.Ladder.repository.GameConfigurationRepository
 import groovy.util.logging.Slf4j
 import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
 
 import java.util.stream.IntStream
 
@@ -90,24 +86,5 @@ class GameConfigurationService {
 
         log.info("[${className}][getGameConfig][Exit]")
         return Either.right(gameConfigurationOptional.get())
-    }
-
-    def nextTurn(Map<String, Object> turnRequest) {
-        log.info("[${className}][nextTurn][Enter]")
-        String emailId = turnRequest.emailId
-        String sum = turnRequest.sum
-        PlayerDto playerDto = new PlayerDto().tap {
-            name = "Anirudh"
-            it.emailId = "anirudh1035@gmail.com"
-            password = "Password1"
-        }
-        WebClient webClient = WebClient.create()
-        WebClient.ResponseSpec responseSpec = webClient.post()
-                                                       .uri("http://localhost:8080/player/register")
-                                                       .contentType(MediaType.APPLICATION_JSON)
-                                                       .bodyValue(playerDto)
-                                                       .retrieve()
-        return responseSpec
-        log.info("[${className}][nextTurn][Exit]")
     }
 }

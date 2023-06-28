@@ -30,7 +30,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'io.vavr:vavr:0.10.4'
 	implementation 'org.springframework.boot:spring-boot-starter-json:3.0.6'
-
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {
