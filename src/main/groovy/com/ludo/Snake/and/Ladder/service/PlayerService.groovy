@@ -1,6 +1,7 @@
 package com.ludo.Snake.and.Ladder.service
 
 import com.ludo.Snake.and.Ladder.Constants
+import com.ludo.Snake.and.Ladder.Util.Utilities
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
@@ -11,10 +12,14 @@ import com.ludo.Snake.and.Ladder.model.PlayerDto
 import com.ludo.Snake.and.Ladder.repository.GameConfigurationRepository
 import com.ludo.Snake.and.Ladder.repository.PlayerRepository
 import groovy.util.logging.Slf4j
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
+import java.security.SecureRandom
 import java.util.stream.IntStream
 
 @Slf4j
@@ -117,9 +122,14 @@ class PlayerService {
             log.error("Unable to login Password did not match")
             return Either.left(new GenericErrorResponse(status: 404, reason: "Wrong password"))
         }
-        log.info("Player successfully validated.")
+        log.info("Player successfully validated. Generating Access token")
         log.info("[${className}][login][Exit]")
-        return Either.right(new GenericSuccessResponse(status: 200, reason: "Login Successfully"))
+        Map<String, Object> claims = new HashMap<>()
+        claims["name"] = player.name
+        claims["emailId"] = player.emailId
+        String accessToken = Utilities.generateAccessToken(claims)
+        log.info("Access Token = ${accessToken}")
+        return Either.right(new GenericSuccessResponse(status: 200, reason: "Login Successfully", accessToken: accessToken))
     }
 
 }
