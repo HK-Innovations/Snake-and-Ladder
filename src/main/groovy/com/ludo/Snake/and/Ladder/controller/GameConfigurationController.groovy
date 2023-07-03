@@ -48,7 +48,7 @@ class GameConfigurationController {
     def getGameConfig(@RequestParam String gameId) {
         log.info("[${className}][getGameConfiguration][Enter]")
         log.info("gameId: ${gameId}")
-        Either<GenericErrorResponse,GameConfiguration> response = gameConfigurationService.getGameConfig(gameId)
+        Either<GenericErrorResponse, GameConfiguration> response = gameConfigurationService.getGameConfig(gameId)
 
         if(response.isLeft()) {
             log.info("[${className}][getGameConfiguration][Exit]")
@@ -56,13 +56,5 @@ class GameConfigurationController {
         }
         log.info("[${className}][getGameConfiguration][Exit]")
         return response.get()
-    }
-
-    @GetMapping("/nextTurn")
-    def nextTurn(@RequestBody Map<String, Object> turnRequest) {
-        log.info("[${className}][nextTurn][Enter]")
-        def response = gameConfigurationService.nextTurn(turnRequest)
-
-        log.info("[${className}][nextTurn][Exit]")
     }
 }
