@@ -83,8 +83,6 @@ class PlayerService {
 
         GameConfiguration gameConfiguration = OptionalGameConfiguration.get()
         Player player = OptionalPlayer.get()
-       // Set<PlayerBox> playerBoxes =
-
         PlayerBox playerAvailable = gameConfiguration.board.playerBoxes.stream().filter
                                                       {player.pid.equals(it.getPid())}.findFirst().orElse(null)
         if(playerAvailable != null) {
@@ -111,7 +109,7 @@ class PlayerService {
             Board board = gameConfiguration.board
             board.getPlayerBoxes().add(newPlayerBox)
             board = boardRepository.save(board)
-           newPlayerBox = board.playerBoxes.stream().filter
+            newPlayerBox = board.playerBoxes.stream().filter
             {player.pid.equals(it.getPid())}.findFirst().orElse(null)
         } catch(Exception ex) {
             log.error("Exception occurred while add player in game. Exception: ${ex.getLocalizedMessage()}")
