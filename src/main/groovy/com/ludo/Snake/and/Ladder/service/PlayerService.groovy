@@ -46,7 +46,7 @@ class PlayerService {
 
     Either<GenericErrorResponse,Player> playerRegister(PlayerDto playerDto) {
         Random random = new Random()
-        List<IntStream> randomNumberGenerator = random.ints(1,0, Integer.MAX_VALUE).findAll()
+        ArrayList<IntStream> randomNumberGenerator = random.ints(1,0, Integer.MAX_VALUE).findAll()
         String playerId = "player_" + randomNumberGenerator[0].toString()
         Player player = new Player().tap {
             pid = playerId
@@ -156,18 +156,25 @@ class PlayerService {
         }
         Player player = optionalPlayer.get()
         GameConfiguration gameConfiguration = optionalGameConfiguration.get()
-        if(gameConfiguration.gameState == Constants.GameState.FINISHED) {
-            log.info("Game for game id ${gameConfiguration.id} is already finished.")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Game already Finished"))
+        if(gameConfiguration.gameState == Constants.GameState.FINISHED || gameConfiguration.gameState == Constants.GameState.JOIN) {
+            log.info("Game for game id ${gameConfiguration.id} is in ${gameConfiguration.gameState} state.")
+            return Either.left(new GenericErrorResponse(status: 400, reason: "Game state is ${gameConfiguration.gameState}"))
         }
 
         PlayerBox currentPlayer = gameConfiguration.board.playerBoxes.stream().filter
                                       {player.pid.equals(it.getPid())}.findAny().orElse(null)
+        if(currentPlayer == null) {
+            log.info("Player ${moveRequest.emailId} is not in the game with id ${moveRequest.gameId}")
+            return Either.left(new GenericErrorResponse(status: 400, reason: "Player is not in the game"))
+        }
 
         MoveResponse moveResponse = new MoveResponse()
         moveResponse.oldPosition = currentPlayer.getPosition()
 
-        currentPlayer.position = currentPlayer.position + moveRequest.sum
+        Integer newPosition = ((currentPlayer.position + moveRequest.sum) > gameConfiguration.boardSize) ?
+                                        currentPlayer.position : currentPlayer.position + moveRequest.sum
+
+        currentPlayer.position = newPosition
         String newSnakeOrLadderPosition = gameConfiguration.board.snakeOrLadder.get(currentPlayer.position.toString())
 
         if(newSnakeOrLadderPosition != null) {
@@ -190,6 +197,7 @@ class PlayerService {
             return Either.left(new GenericErrorResponse(status: 404, reason: "Error occurred while saving"))
         }
 
+        log.info("Player ${moveRequest.emailId} new position is ${moveResponse.newPosition}")
         log.info("[${className}][nextTurn][Exit]")
         return Either.right(moveResponse)
     }

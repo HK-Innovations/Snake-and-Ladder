@@ -57,4 +57,16 @@ class GameConfigurationController {
         log.info("[${className}][getGameConfiguration][Exit]")
         return response.get()
     }
+
+    @PostMapping("/startGame")
+    def startGame(@RequestParam String gameId) {
+        log.info("[${className}][startGame][Enter]")
+        Either<GenericErrorResponse, GenericSuccessResponse> startGameResponse = gameConfigurationService.startGame(gameId)
+        if(startGameResponse.isLeft()) {
+            log.info("[${className}][startGame][Exit]")
+            return startGameResponse.getLeft()
+        }
+        log.info("[${className}][startGame][Exit]")
+        return startGameResponse.get()
+    }
 }
