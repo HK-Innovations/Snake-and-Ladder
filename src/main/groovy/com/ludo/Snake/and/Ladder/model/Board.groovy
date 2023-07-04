@@ -20,7 +20,7 @@ class Board {
 
     //@Convert(converter = GenericListConverter<Player>.class)
     @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.EAGER)
-    List<PlayerBox> playerBoxes
+    Set<PlayerBox> playerBoxes
 
     @Convert(converter = GenericMapConverter<String, String>.class)
     Map<String,String> snakeOrLadder

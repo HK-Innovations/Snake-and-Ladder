@@ -91,23 +91,4 @@ class GameConfigurationService {
         log.info("[${className}][getGameConfig][Exit]")
         return Either.right(gameConfigurationOptional.get())
     }
-
-    def nextTurn(Map<String, Object> turnRequest) {
-        log.info("[${className}][nextTurn][Enter]")
-        String emailId = turnRequest.emailId
-        String sum = turnRequest.sum
-        PlayerDto playerDto = new PlayerDto().tap {
-            name = "Anirudh"
-            it.emailId = "anirudh1035@gmail.com"
-            password = "Password1"
-        }
-        WebClient webClient = WebClient.create()
-        WebClient.ResponseSpec responseSpec = webClient.post()
-                                                       .uri("http://localhost:8080/player/register")
-                                                       .contentType(MediaType.APPLICATION_JSON)
-                                                       .bodyValue(playerDto)
-                                                       .retrieve()
-        return responseSpec
-        log.info("[${className}][nextTurn][Exit]")
-    }
 }

@@ -1,12 +1,10 @@
 package com.ludo.Snake.and.Ladder.model
 
-import com.ludo.Snake.and.Ladder.Constants
+import com.ludo.Snake.and.Ladder.Constants.GameState
 import jakarta.persistence.CascadeType
-import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToOne
 import lombok.NoArgsConstructor
 
@@ -22,7 +20,7 @@ class GameConfiguration {
     Integer boardColumns
     Integer boardSize
     Integer playerCount
-   Constants.GameState gameState
+    GameState gameState
     //@Convert(converter = GenericListConverter<Board>.class)
     @OneToOne(cascade = CascadeType.ALL , fetch = FetchType.EAGER)
     Board board
