@@ -3,6 +3,7 @@ package com.ludo.Snake.and.Ladder.controller
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
+import com.ludo.Snake.and.Ladder.model.MoveRequest
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.model.PlayerDto
@@ -12,6 +13,7 @@ import io.vavr.control.Either
 import jakarta.annotation.Nullable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -66,5 +68,17 @@ class PlayerController {
 
         log.info("[${className}][login][Exit]")
         return loginResponse.get()
+    }
+
+    @PostMapping("/movePlayer")
+    def movePlayer(@RequestBody MoveRequest moveRequest) {
+        log.info("[${className}][movePlayer][Enter]")
+        def response = playerService.movePlayer(moveRequest)
+        if(response.isLeft()) {
+            log.info("[${className}][movePlayer][Exit]")
+            return response.getLeft()
+        }
+        log.info("[${className}][movePlayer][Exit]")
+        return response.get()
     }
 }
