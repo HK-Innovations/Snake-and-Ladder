@@ -1,7 +1,7 @@
 package com.ludo.Snake.and.Ladder.controller
 
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
-import com.ludo.Snake.and.Ladder.model.GameConfigurationDto
+import com.ludo.Snake.and.Ladder.Dto.GameConfigurationDto
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.service.GameConfigurationService

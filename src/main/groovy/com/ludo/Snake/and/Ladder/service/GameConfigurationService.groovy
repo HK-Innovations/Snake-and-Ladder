@@ -4,18 +4,17 @@ import com.ludo.Snake.and.Ladder.Constants
 import com.ludo.Snake.and.Ladder.model.Board
 import com.ludo.Snake.and.Ladder.model.Dice
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
-import com.ludo.Snake.and.Ladder.model.GameConfigurationDto
+import com.ludo.Snake.and.Ladder.Dto.GameConfigurationDto
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
-import com.ludo.Snake.and.Ladder.model.PlayerDto
+import com.ludo.Snake.and.Ladder.model.Player
+import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.repository.GameConfigurationRepository
+import com.ludo.Snake.and.Ladder.repository.PlayerRepository
 import groovy.util.logging.Slf4j
 import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.AutoConfigureOrder
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
 
 import java.util.stream.IntStream
 
@@ -27,6 +26,9 @@ class GameConfigurationService {
     @Autowired
     GameConfigurationRepository gameConfigurationRepository
 
+    @Autowired
+    PlayerRepository playerRepository
+
     private final className = this.class.simpleName
 
     Either<GenericErrorResponse, GameConfiguration> saveGameConfig(GameConfigurationDto gameConfigurationRequest) {
@@ -36,12 +38,14 @@ class GameConfigurationService {
         String gameConfigId = "game_" + randomNumberGenerator[0].toString()
         String boardId = "board_" + randomNumberGenerator[1].toString()
         String diceId = "dice_" + randomNumberGenerator[2].toString()
+        Player player = playerRepository.findByEmailId(gameConfigurationRequest.emailId).get()
 
         GameConfiguration gameConfiguration = new GameConfiguration().tap {
             id = gameConfigId
             boardRows = gameConfigurationRequest.boardRows
             boardColumns = gameConfigurationRequest.boardColumns
             playerCount = gameConfigurationRequest.playerCount
+            emailId = gameConfigurationRequest.emailId
             gameState = gameConfigurationRequest.gameState
             boardSize = gameConfigurationRequest.boardRows * gameConfigurationRequest.boardColumns
         }
@@ -54,7 +58,12 @@ class GameConfigurationService {
             it.dice = dice
             snakeOrLadder = gameConfigurationRequest.snakeOrLadder
         }
+        PlayerBox playerBox = new PlayerBox().tap {
+            pid = player.pid
+            position = 0
+        }
         gameConfiguration.board = board
+        gameConfiguration.board.playerBoxes.add(playerBox)
 
         GameConfiguration gameConfigurationResponse
         try {
