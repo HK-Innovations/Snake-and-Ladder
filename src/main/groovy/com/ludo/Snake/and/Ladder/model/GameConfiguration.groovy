@@ -20,6 +20,7 @@ class GameConfiguration {
     Integer boardColumns
     Integer boardSize
     Integer playerCount
+    String emailId
     GameState gameState
     //@Convert(converter = GenericListConverter<Board>.class)
     @OneToOne(cascade = CascadeType.ALL , fetch = FetchType.EAGER)
