@@ -2,6 +2,7 @@ package com.ludo.Snake.and.Ladder.service
 
 import com.ludo.Snake.and.Ladder.Constants
 import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
+import com.ludo.Snake.and.Ladder.Dto.PlayerBoxResponse
 import com.ludo.Snake.and.Ladder.Util.Utilities
 import com.ludo.Snake.and.Ladder.model.Board
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
@@ -66,7 +67,29 @@ class PlayerService {
         return Either.right(playerResponse)
     }
 
-    Either<GenericErrorResponse, PlayerBox> joinPlayer(JoinPlayer joinPlayerReq) {
+    Either<GenericErrorResponse, AccessTokenResponse> login(String emailId, String password) {
+        log.info("[${className}][login][Enter]")
+        Optional<Player> optionalPlayer = playerRepository.findByEmailId(emailId)
+        if(optionalPlayer.isEmpty()) {
+            log.error("Player not found with email: ${emailId}")
+            return Either.left(new GenericErrorResponse(status: 404, reason: "EmailId not found"))
+        }
+        Player player = optionalPlayer.get()
+        if(player.password != password) {
+            log.error("Unable to login Password did not match")
+            return Either.left(new GenericErrorResponse(status: 404, reason: "Wrong password"))
+        }
+        log.info("Player successfully validated. Generating Access token")
+        log.info("[${className}][login][Exit]")
+        Map<String, Object> claims = new HashMap<>()
+        claims["name"] = player.name
+        claims["emailId"] = player.emailId
+        String accessToken = Utilities.generateAccessToken(claims)
+        log.info("Access Token = ${accessToken}")
+        return Either.right(new AccessTokenResponse(accessToken: accessToken))
+    }
+
+    Either<GenericErrorResponse, PlayerBoxResponse> joinPlayer(JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
         String emailId = joinPlayerReq.emailId
         String gameId = joinPlayerReq.gameId
@@ -109,40 +132,21 @@ class PlayerService {
         try {
             Board board = gameConfiguration.board
             board.getPlayerBoxes().add(newPlayerBox)
-            board = boardRepository.save(board)
-            newPlayerBox = board.playerBoxes.stream().filter
-            {player.pid.equals(it.getPid())}.findFirst().orElse(null)
+            boardRepository.save(board)
         } catch(Exception ex) {
             log.error("Exception occurred while add player in game. Exception: ${ex.getLocalizedMessage()}")
             return Either.left(new GenericErrorResponse(status: 400, reason: "There was some error while saving, please try again."))
         }
+        PlayerBoxResponse playerBoxResponse = new PlayerBoxResponse().tap {
+            pid = newPlayerBox.pid
+            position = newPlayerBox.position
+            name = player.name
+        }
         log.info("[${className}][joinPlayer][Exit]")
-        return Either.right(newPlayerBox)
+        return Either.right(playerBoxResponse)
     }
 
-    Either<GenericErrorResponse, AccessTokenResponse> login(String emailId, String password) {
-        log.info("[${className}][login][Enter]")
-        Optional<Player> optionalPlayer = playerRepository.findByEmailId(emailId)
-        if(optionalPlayer.isEmpty()) {
-            log.error("Player not found with email: ${emailId}")
-            return Either.left(new GenericErrorResponse(status: 404, reason: "EmailId not found"))
-        }
-        Player player = optionalPlayer.get()
-        if(player.password != password) {
-            log.error("Unable to login Password did not match")
-            return Either.left(new GenericErrorResponse(status: 404, reason: "Wrong password"))
-        }
-        log.info("Player successfully validated. Generating Access token")
-        log.info("[${className}][login][Exit]")
-        Map<String, Object> claims = new HashMap<>()
-        claims["name"] = player.name
-        claims["emailId"] = player.emailId
-        String accessToken = Utilities.generateAccessToken(claims)
-        log.info("Access Token = ${accessToken}")
-        return Either.right(new AccessTokenResponse(accessToken: accessToken))
-    }
-
-    Either<GenericErrorResponse, String> movePlayer(MoveRequest moveRequest) {
+    Either<GenericErrorResponse, MoveResponse> movePlayer(MoveRequest moveRequest) {
         log.info("[${className}][nextTurn][Enter]")
         Optional<GameConfiguration> optionalGameConfiguration = gameConfigurationRepository.findById(moveRequest.gameId)
         Optional<Player> optionalPlayer = playerRepository.findByEmailId(moveRequest.emailId)

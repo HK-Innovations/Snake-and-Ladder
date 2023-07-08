@@ -1,10 +1,12 @@
 package com.ludo.Snake.and.Ladder.controller
 
 import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
+import com.ludo.Snake.and.Ladder.Dto.PlayerBoxResponse
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.MoveRequest
+import com.ludo.Snake.and.Ladder.model.MoveResponse
 import com.ludo.Snake.and.Ladder.model.Player
 import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.model.PlayerDto
@@ -46,7 +48,7 @@ class PlayerController {
     @PostMapping("/join")
     def joinPlayer(@RequestBody JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
-        Either<GenericErrorResponse, PlayerBox> joinResponse = playerService.joinPlayer(joinPlayerReq)
+        Either<GenericErrorResponse, PlayerBoxResponse> joinResponse = playerService.joinPlayer(joinPlayerReq)
         if(joinResponse.isLeft()) {
             log.info("[${className}][joinPlayer][Exit]")
             return joinResponse.getLeft()
@@ -74,7 +76,7 @@ class PlayerController {
     @PostMapping("/movePlayer")
     def movePlayer(@RequestBody MoveRequest moveRequest) {
         log.info("[${className}][movePlayer][Enter]")
-        def response = playerService.movePlayer(moveRequest)
+        Either<GenericErrorResponse, MoveResponse> response = playerService.movePlayer(moveRequest)
         if(response.isLeft()) {
             log.info("[${className}][movePlayer][Exit]")
             return response.getLeft()
