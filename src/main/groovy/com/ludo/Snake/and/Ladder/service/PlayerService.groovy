@@ -1,6 +1,7 @@
 package com.ludo.Snake.and.Ladder.service
 
 import com.ludo.Snake.and.Ladder.Constants
+import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
 import com.ludo.Snake.and.Ladder.Util.Utilities
 import com.ludo.Snake.and.Ladder.model.Board
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
@@ -119,7 +120,7 @@ class PlayerService {
         return Either.right(newPlayerBox)
     }
 
-    Either<GenericErrorResponse, GenericSuccessResponse> login(String emailId, String password) {
+    Either<GenericErrorResponse, AccessTokenResponse> login(String emailId, String password) {
         log.info("[${className}][login][Enter]")
         Optional<Player> optionalPlayer = playerRepository.findByEmailId(emailId)
         if(optionalPlayer.isEmpty()) {
@@ -138,7 +139,7 @@ class PlayerService {
         claims["emailId"] = player.emailId
         String accessToken = Utilities.generateAccessToken(claims)
         log.info("Access Token = ${accessToken}")
-        return Either.right(new GenericSuccessResponse(status: 200, reason: "Login Successfully", accessToken: accessToken))
+        return Either.right(new AccessTokenResponse(accessToken: accessToken))
     }
 
     Either<GenericErrorResponse, String> movePlayer(MoveRequest moveRequest) {

@@ -1,5 +1,6 @@
 package com.ludo.Snake.and.Ladder.controller
 
+import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
 import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
@@ -60,7 +61,7 @@ class PlayerController {
         log.info("[${className}][login][Enter]")
         String emailId = request.emailId
         String password = request.password
-        Either<GenericErrorResponse, GenericSuccessResponse> loginResponse = playerService.login(emailId,password)
+        Either<GenericErrorResponse, AccessTokenResponse> loginResponse = playerService.login(emailId,password)
         if(loginResponse.isLeft()) {
             log.info("[${className}][login][Exit]")
             return loginResponse.getLeft()
