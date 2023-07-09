@@ -1,0 +1,17 @@
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/Dto/AccessTokenResponse.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/repository/BoardRepository.class
+/.gradle/buildOutputCleanup/buildOutputCleanup.lock
+/.gradle/7.6.1/executionHistory/executionHistory.bin
+/.gradle/7.6.1/executionHistory/executionHistory.lock
+/.gradle/file-system.probe
+/.gradle/7.6.1/fileHashes/fileHashes.bin
+/.gradle/7.6.1/fileHashes/fileHashes.lock
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/Dto/GameConfigurationDto.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/service/GameConfigurationService$_getGameConfig_closure7.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/service/GameConfigurationService$_saveGameConfig_closure5.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/model/MoveRequest.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/model/MoveResponse.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/Dto/PlayerBoxResponse.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/service/PlayerService$_joinPlayer_closure4.class
+/build/classes/groovy/main/com/ludo/Snake/and/Ladder/service/PlayerService$_movePlayer_closure5.class
+/.idea/uiDesigner.xml
