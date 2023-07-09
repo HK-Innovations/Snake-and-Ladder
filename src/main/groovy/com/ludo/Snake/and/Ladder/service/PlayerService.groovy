@@ -61,7 +61,7 @@ class PlayerService {
            playerResponse = playerRepository.save(player)
         } catch (Exception ex) {
             log.error("Exception occurred while saving player details", ex)
-            return Either.left(new GenericErrorResponse(status: 404, reason: "Exception occurred while saving player details: ${ex.getLocalizedMessage()}"))
+            return Either.left(new GenericErrorResponse(status: 400, reason: "Exception occurred while saving player details: ${ex.getLocalizedMessage()}"))
         }
         log.info("Player created with playerId: ${player.pid}")
         return Either.right(playerResponse)
@@ -77,7 +77,7 @@ class PlayerService {
         Player player = optionalPlayer.get()
         if(player.password != password) {
             log.error("Unable to login Password did not match")
-            return Either.left(new GenericErrorResponse(status: 404, reason: "Wrong password"))
+            return Either.left(new GenericErrorResponse(status: 401, reason: "Wrong password"))
         }
         log.info("Player successfully validated. Generating Access token")
         log.info("[${className}][login][Exit]")
@@ -111,17 +111,17 @@ class PlayerService {
                                                       {player.pid.equals(it.getPid())}.findFirst().orElse(null)
         if(playerAvailable != null) {
             log.error("Player ${player.pid} already joined game.")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Player Already Joined"))
+            return Either.left(new GenericErrorResponse(status: 409, reason: "Player Already Joined"))
         }
 
         if(gameConfiguration.board.playerBoxes.size() == gameConfiguration.playerCount) {
             log.error("Maximum limit reached PlayerCount: ${gameConfiguration.playerCount} ")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Max Player Reached"))
+            return Either.left(new GenericErrorResponse(status: 429, reason: "Max Player Reached"))
         }
 
         if(gameConfiguration.gameState != Constants.GameState.JOIN) {
             log.error("Game id ${gameId} is not in Join State")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Game is not in Join State"))
+            return Either.left(new GenericErrorResponse(status: 404, reason: "Game is not in Join State"))
         }
 
         PlayerBox newPlayerBox = new PlayerBox().tap {
@@ -163,14 +163,14 @@ class PlayerService {
         GameConfiguration gameConfiguration = optionalGameConfiguration.get()
         if(gameConfiguration.gameState == Constants.GameState.FINISHED || gameConfiguration.gameState == Constants.GameState.JOIN) {
             log.info("Game for game id ${gameConfiguration.id} is in ${gameConfiguration.gameState} state.")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Game state is ${gameConfiguration.gameState}"))
+            return Either.left(new GenericErrorResponse(status: 404, reason: "Game state is ${gameConfiguration.gameState}"))
         }
 
         PlayerBox currentPlayer = gameConfiguration.board.playerBoxes.stream().filter
                                       {player.pid.equals(it.getPid())}.findAny().orElse(null)
         if(currentPlayer == null) {
             log.info("Player ${moveRequest.emailId} is not in the game with id ${moveRequest.gameId}")
-            return Either.left(new GenericErrorResponse(status: 400, reason: "Player is not in the game"))
+            return Either.left(new GenericErrorResponse(status: 404, reason: "Player is not in the game"))
         }
 
         MoveResponse moveResponse = new MoveResponse()
