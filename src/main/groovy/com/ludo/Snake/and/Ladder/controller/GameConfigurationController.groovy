@@ -8,6 +8,8 @@ import com.ludo.Snake.and.Ladder.service.GameConfigurationService
 import groovy.util.logging.Slf4j
 import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -38,7 +40,7 @@ class GameConfigurationController {
         Either<GenericErrorResponse, GameConfiguration> gameConfigResponse = gameConfigurationService.saveGameConfig(gameConfigurationRequest)
         if(gameConfigResponse.isLeft()) {
             log.info("[${className}][gameConfigSetup][Exit]")
-            return gameConfigResponse.getLeft()
+            return new ResponseEntity<>(gameConfigResponse.getLeft(), HttpStatusCode.valueOf(gameConfigResponse.getLeft().status))
         }
         log.info("[${className}][gameConfigSetup][Exit]")
         return gameConfigResponse.get()
@@ -52,7 +54,7 @@ class GameConfigurationController {
 
         if(response.isLeft()) {
             log.info("[${className}][getGameConfiguration][Exit]")
-            return response.getLeft()
+            return new ResponseEntity<>(response.getLeft(), HttpStatusCode.valueOf(response.getLeft().status))
         }
         log.info("[${className}][getGameConfiguration][Exit]")
         return response.get()
@@ -64,7 +66,7 @@ class GameConfigurationController {
         Either<GenericErrorResponse, GenericSuccessResponse> startGameResponse = gameConfigurationService.startGame(gameId)
         if(startGameResponse.isLeft()) {
             log.info("[${className}][startGame][Exit]")
-            return startGameResponse.getLeft()
+            return new ResponseEntity<>(startGameResponse.getLeft(), HttpStatusCode.valueOf(startGameResponse.getLeft().status))
         }
         log.info("[${className}][startGame][Exit]")
         return startGameResponse.get()

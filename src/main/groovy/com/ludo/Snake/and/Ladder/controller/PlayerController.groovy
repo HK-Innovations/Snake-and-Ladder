@@ -15,6 +15,8 @@ import groovy.util.logging.Slf4j
 import io.vavr.control.Either
 import jakarta.annotation.Nullable
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,7 +41,7 @@ class PlayerController {
         Either<GenericErrorResponse, Player> playerResponse = playerService.playerRegister(playerDto)
         if(playerResponse.isLeft()){
             log.info("[${className}][registerPlayer][Exit]")
-            return playerResponse.getLeft()
+            return new ResponseEntity<>(playerResponse.getLeft(), HttpStatusCode.valueOf(playerResponse.getLeft().status))
         }
         log.info("[${className}][registerPlayer][Exit]")
         return playerResponse.get()
@@ -51,7 +53,7 @@ class PlayerController {
         Either<GenericErrorResponse, PlayerBoxResponse> joinResponse = playerService.joinPlayer(joinPlayerReq)
         if(joinResponse.isLeft()) {
             log.info("[${className}][joinPlayer][Exit]")
-            return joinResponse.getLeft()
+            return new ResponseEntity<>(joinResponse.getLeft(), HttpStatusCode.valueOf(joinResponse.getLeft().status))
         }
 
         log.info("[${className}][joinPlayer][Exit]")
@@ -66,7 +68,7 @@ class PlayerController {
         Either<GenericErrorResponse, AccessTokenResponse> loginResponse = playerService.login(emailId,password)
         if(loginResponse.isLeft()) {
             log.info("[${className}][login][Exit]")
-            return loginResponse.getLeft()
+            return new ResponseEntity<>(loginResponse.getLeft(), HttpStatusCode.valueOf(loginResponse.getLeft().status))
         }
 
         log.info("[${className}][login][Exit]")
@@ -79,7 +81,7 @@ class PlayerController {
         Either<GenericErrorResponse, MoveResponse> response = playerService.movePlayer(moveRequest)
         if(response.isLeft()) {
             log.info("[${className}][movePlayer][Exit]")
-            return response.getLeft()
+            return new ResponseEntity<>(response.getLeft(), HttpStatusCode.valueOf(response.getLeft().status))
         }
         log.info("[${className}][movePlayer][Exit]")
         return response.get()
