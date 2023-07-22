@@ -125,6 +125,7 @@ class PlayerService {
         }
 
         PlayerBox newPlayerBox = new PlayerBox().tap {
+            seq = gameConfiguration.board.getPlayerBoxes().size()+1
             pid = player.pid
             position = 0
         }

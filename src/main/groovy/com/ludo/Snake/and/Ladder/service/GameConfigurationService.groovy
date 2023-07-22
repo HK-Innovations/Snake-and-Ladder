@@ -1,6 +1,7 @@
 package com.ludo.Snake.and.Ladder.service
 
 import com.ludo.Snake.and.Ladder.Constants
+import com.ludo.Snake.and.Ladder.Dto.StartGameResponse
 import com.ludo.Snake.and.Ladder.model.Board
 import com.ludo.Snake.and.Ladder.model.Dice
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
@@ -57,8 +58,10 @@ class GameConfigurationService {
             id = boardId
             it.dice = dice
             snakeOrLadder = gameConfigurationRequest.snakeOrLadder
+            playerTurn = 0
         }
         PlayerBox playerBox = new PlayerBox().tap {
+            seq = 1
             pid = player.pid
             position = 0
         }
@@ -103,7 +106,7 @@ class GameConfigurationService {
         return Either.right(gameConfigurationOptional.get())
     }
 
-    Either<GenericErrorResponse, GenericSuccessResponse> startGame(String gameId) {
+    Either<GenericErrorResponse, StartGameResponse> startGame(String gameId) {
         log.info("[${className}][startGame][Enter]")
         Optional<GameConfiguration> optionalGameConfiguration = gameConfigurationRepository.findById(gameId)
         if(optionalGameConfiguration.isEmpty()) {
@@ -121,8 +124,14 @@ class GameConfigurationService {
             log.error("Game with game id ${gameId} already finished ")
             return Either.left(new GenericErrorResponse(status: 400, reason: "Game already finished"))
         }
-
+        //generating a random number among total players that we have to start the game with
+        int startRange = 1, endRange = gameConfiguration.board.playerBoxes.size()
+        Random random = new Random()
+        int playerToStartWith = random.nextInt(endRange - startRange + 1) + startRange
+        log.info("playerToStartWith = ${playerToStartWith}")
+        playerToStartWith = 4
         try {
+            gameConfiguration.board.playerTurn = playerToStartWith
             gameConfiguration.setGameState(Constants.GameState.IN_PROGRESS)
             gameConfiguration = gameConfigurationRepository.save(gameConfiguration)
         } catch (Exception ex) {
@@ -130,7 +139,17 @@ class GameConfigurationService {
             return Either.left(new GenericErrorResponse(status: 400, reason: "Error occurred while saving game, please try again"))
         }
         log.info("Game state updated to ${gameConfiguration.gameState}")
+        PlayerBox playerBox = gameConfiguration.board.playerBoxes.stream().filter
+                                        {playerToStartWith.equals(it.getSeq())}.findFirst().orElse(null)
+        log.info("playerBox: ${playerBox}")
+
+        String playerTurnMail = playerRepository.findById(playerBox.id).get().emailId
+        log.info("Player turn is ${playerTurnMail}")
+        StartGameResponse startGameResponse = new StartGameResponse().tap {
+            gameState = gameConfiguration.getGameState()
+            playerTurnEmailId = playerTurnMail
+        }
         log.info("[${className}][startGame][Exit]")
-        return Either.right(new GenericSuccessResponse(status: 200, reason: "Game started successfully"))
+        return Either.right(startGameResponse)
     }
 }
