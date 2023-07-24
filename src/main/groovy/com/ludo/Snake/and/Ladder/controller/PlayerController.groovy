@@ -76,6 +76,8 @@ class PlayerController {
         return loginResponse.get()
     }
 
+    @MessageMapping("/movePlayer")  // /app/movePlayer
+    @SendTo("/movePlayer/public") // subscription part
     @PostMapping("/movePlayer")
     def movePlayer(@RequestBody MoveRequest moveRequest) {
         log.info("[${className}][movePlayer][Enter]")
