@@ -25,6 +25,8 @@ class Board {
     @Convert(converter = GenericMapConverter<String, String>.class)
     Map<String,String> snakeOrLadder
 
+    Integer playerTurn
+
     Board() {
        // playerDeque = new ArrayList<>()
     }

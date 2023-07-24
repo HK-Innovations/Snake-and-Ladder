@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/hk_snake_ladder
+    url: 'jdbc:mysql://localhost:3306/hk_snake_ladder'
     username: user
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver

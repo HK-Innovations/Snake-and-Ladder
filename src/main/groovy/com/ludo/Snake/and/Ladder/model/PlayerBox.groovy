@@ -15,6 +15,7 @@ class PlayerBox {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Integer id
+    Integer seq
     String pid
     Integer position
 

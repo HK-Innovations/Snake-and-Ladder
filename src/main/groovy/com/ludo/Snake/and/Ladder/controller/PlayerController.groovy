@@ -1,28 +1,27 @@
 package com.ludo.Snake.and.Ladder.controller
 
 import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
+
 import com.ludo.Snake.and.Ladder.Dto.PlayerBoxResponse
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
-import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
 import com.ludo.Snake.and.Ladder.model.MoveRequest
 import com.ludo.Snake.and.Ladder.model.MoveResponse
 import com.ludo.Snake.and.Ladder.model.Player
-import com.ludo.Snake.and.Ladder.model.PlayerBox
 import com.ludo.Snake.and.Ladder.model.PlayerDto
 import com.ludo.Snake.and.Ladder.service.PlayerService
 import groovy.util.logging.Slf4j
 import io.vavr.control.Either
-import jakarta.annotation.Nullable
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -47,8 +46,10 @@ class PlayerController {
         return playerResponse.get()
     }
 
+    @MessageMapping("/joinPlayer") // /app/joinPlayer (message part)
+    @SendTo("/joinPlayer/public") // subscription part
     @PostMapping("/join")
-    def joinPlayer(@RequestBody JoinPlayer joinPlayerReq) {
+    def joinPlayer(@Payload JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
         Either<GenericErrorResponse, PlayerBoxResponse> joinResponse = playerService.joinPlayer(joinPlayerReq)
         if(joinResponse.isLeft()) {
@@ -75,6 +76,8 @@ class PlayerController {
         return loginResponse.get()
     }
 
+    @MessageMapping("/movePlayer")  // /app/movePlayer
+    @SendTo("/movePlayer/public") // subscription part
     @PostMapping("/movePlayer")
     def movePlayer(@RequestBody MoveRequest moveRequest) {
         log.info("[${className}][movePlayer][Enter]")

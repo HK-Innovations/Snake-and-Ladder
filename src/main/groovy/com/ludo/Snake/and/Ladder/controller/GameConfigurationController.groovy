@@ -1,5 +1,6 @@
 package com.ludo.Snake.and.Ladder.controller
 
+import com.ludo.Snake.and.Ladder.Dto.StartGameResponse
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.Dto.GameConfigurationDto
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
@@ -10,6 +11,9 @@ import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
+import org.springframework.messaging.handler.annotation.MessageMapping
+import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -60,10 +64,12 @@ class GameConfigurationController {
         return response.get()
     }
 
+    @MessageMapping("/startGame") // /app/startGame (messaging part)
+    @SendTo("/startGame/public") // subscription part
     @PostMapping("/startGame")
-    def startGame(@RequestParam String gameId) {
+    def startGame(@Payload String gameId) {
         log.info("[${className}][startGame][Enter]")
-        Either<GenericErrorResponse, GenericSuccessResponse> startGameResponse = gameConfigurationService.startGame(gameId)
+        Either<GenericErrorResponse, StartGameResponse> startGameResponse = gameConfigurationService.startGame(gameId)
         if(startGameResponse.isLeft()) {
             log.info("[${className}][startGame][Exit]")
             return new ResponseEntity<>(startGameResponse.getLeft(), HttpStatusCode.valueOf(startGameResponse.getLeft().status))
