@@ -18,7 +18,6 @@ class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app")
-        registry.enableSimpleBroker("/startGame","/user","/joinPlayer")
-        registry.setUserDestinationPrefix("/user")
+        registry.enableSimpleBroker("/startGameAll", "/joinPlayerAll", "/movePlayerAll")
     }
 }
