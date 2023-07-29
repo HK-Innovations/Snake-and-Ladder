@@ -47,7 +47,7 @@ class PlayerController {
     }
 
     @MessageMapping("/joinPlayer") // /app/joinPlayer (message part)
-    @SendTo("/joinPlayer/public") // subscription part
+    @SendTo("/joinPlayerAll/public") // subscription part
     @PostMapping("/join")
     def joinPlayer(@Payload JoinPlayer joinPlayerReq) {
         log.info("[${className}][joinPlayer][Enter]")
