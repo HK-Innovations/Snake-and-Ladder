@@ -129,7 +129,6 @@ class GameConfigurationService {
         Random random = new Random()
         int playerToStartWith = random.nextInt(endRange - startRange + 1) + startRange
         log.info("playerToStartWith = ${playerToStartWith}")
-        playerToStartWith = 4
         try {
             gameConfiguration.board.playerTurn = playerToStartWith
             gameConfiguration.setGameState(Constants.GameState.IN_PROGRESS)
@@ -143,7 +142,7 @@ class GameConfigurationService {
                                         {playerToStartWith.equals(it.getSeq())}.findFirst().orElse(null)
         log.info("playerBox: ${playerBox}")
 
-        String playerTurnMail = playerRepository.findById(playerBox.id).get().emailId
+        String playerTurnMail = playerRepository.findById(playerBox.pid).get().emailId
         log.info("Player turn is ${playerTurnMail}")
         StartGameResponse startGameResponse = new StartGameResponse().tap {
             gameState = gameConfiguration.getGameState()

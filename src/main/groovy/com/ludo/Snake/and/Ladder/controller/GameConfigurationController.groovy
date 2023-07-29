@@ -66,7 +66,6 @@ class GameConfigurationController {
 
     @MessageMapping("/startGame") // /app/startGame (messaging part)
     @SendTo("/startGame/public") // subscription part
-    @PostMapping("/startGame")
     def startGame(@Payload String gameId) {
         log.info("[${className}][startGame][Enter]")
         Either<GenericErrorResponse, StartGameResponse> startGameResponse = gameConfigurationService.startGame(gameId)

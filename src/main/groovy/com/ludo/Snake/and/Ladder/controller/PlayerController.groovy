@@ -77,9 +77,8 @@ class PlayerController {
     }
 
     @MessageMapping("/movePlayer")  // /app/movePlayer
-    @SendTo("/movePlayer/public") // subscription part
-    @PostMapping("/movePlayer")
-    def movePlayer(@RequestBody MoveRequest moveRequest) {
+    @SendTo("/movePlayerAll/public") // subscription part
+    def movePlayer(@Payload MoveRequest moveRequest) {
         log.info("[${className}][movePlayer][Enter]")
         Either<GenericErrorResponse, MoveResponse> response = playerService.movePlayer(moveRequest)
         if(response.isLeft()) {
