@@ -195,6 +195,15 @@ class PlayerService {
             gameConfiguration.gameState = Constants.GameState.FINISHED
         }
 
+        int nextMoveSeq = (currentPlayer.seq + 1) % (gameConfiguration.board.playerBoxes.size() + 1);
+        if(nextMoveSeq == 0) nextMoveSeq++;
+
+        String nextPlayerEmailId = playerRepository.findById(gameConfiguration.board.playerBoxes.stream().filter
+                                        {nextMoveSeq.equals(it.getSeq())}.findAny().orElse(null).pid).get().emailId
+
+        log.info("next player move = ${nextMoveSeq}, ${nextPlayerEmailId}")
+        moveResponse.setNextPlayerTurn(nextPlayerEmailId)
+
         try {
             gameConfiguration.board.playerBoxes.add(currentPlayer)
             gameConfigurationRepository.save(gameConfiguration)
