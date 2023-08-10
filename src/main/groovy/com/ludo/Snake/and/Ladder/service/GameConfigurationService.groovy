@@ -63,6 +63,7 @@ class GameConfigurationService {
         PlayerBox playerBox = new PlayerBox().tap {
             seq = 1
             pid = player.pid
+            name = player.name
             position = 0
         }
         gameConfiguration.board = board
