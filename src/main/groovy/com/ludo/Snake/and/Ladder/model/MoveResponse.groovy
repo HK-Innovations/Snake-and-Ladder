@@ -4,6 +4,7 @@ class MoveResponse {
     Integer oldPosition
     Integer newPosition
     String emailId
+    Integer seq
     String nextPlayerTurn
     Boolean gameFinished = false
 }
