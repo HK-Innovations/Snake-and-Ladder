@@ -127,6 +127,7 @@ class PlayerService {
         PlayerBox newPlayerBox = new PlayerBox().tap {
             seq = gameConfiguration.board.getPlayerBoxes().size()+1
             pid = player.pid
+            name = player.name
             position = 0
         }
 

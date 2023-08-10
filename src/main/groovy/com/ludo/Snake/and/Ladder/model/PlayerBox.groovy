@@ -17,6 +17,7 @@ class PlayerBox {
     Integer id
     Integer seq
     String pid
+    String name
     Integer position
 
 //    Integer jumpStart
