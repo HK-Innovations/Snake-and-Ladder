@@ -176,6 +176,7 @@ class PlayerService {
 
         MoveResponse moveResponse = new MoveResponse()
         moveResponse.oldPosition = currentPlayer.getPosition()
+        moveResponse.seq = currentPlayer.seq
 
         Integer newPosition = ((currentPlayer.position + moveRequest.sum) > gameConfiguration.boardSize) ?
                                         currentPlayer.position : currentPlayer.position + moveRequest.sum
