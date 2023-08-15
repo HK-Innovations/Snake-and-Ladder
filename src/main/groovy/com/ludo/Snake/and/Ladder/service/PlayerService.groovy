@@ -5,10 +5,11 @@ import com.ludo.Snake.and.Ladder.Dto.AccessTokenResponse
 import com.ludo.Snake.and.Ladder.Dto.PlayerBoxResponse
 import com.ludo.Snake.and.Ladder.Util.Utilities
 import com.ludo.Snake.and.Ladder.model.Board
+import com.ludo.Snake.and.Ladder.model.Career
 import com.ludo.Snake.and.Ladder.model.GameConfiguration
 import com.ludo.Snake.and.Ladder.model.GenericErrorResponse
-import com.ludo.Snake.and.Ladder.model.GenericSuccessResponse
 import com.ludo.Snake.and.Ladder.model.JoinPlayer
+import com.ludo.Snake.and.Ladder.model.LeaderBoard
 import com.ludo.Snake.and.Ladder.model.MoveRequest
 import com.ludo.Snake.and.Ladder.model.MoveResponse
 import com.ludo.Snake.and.Ladder.model.Player
@@ -18,17 +19,10 @@ import com.ludo.Snake.and.Ladder.repository.BoardRepository
 import com.ludo.Snake.and.Ladder.repository.GameConfigurationRepository
 import com.ludo.Snake.and.Ladder.repository.PlayerRepository
 import groovy.util.logging.Slf4j
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import io.vavr.collection.List
 import io.vavr.control.Either
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.reactive.function.client.WebClient
 
-import java.security.SecureRandom
 import java.util.stream.IntStream
 
 @Slf4j
@@ -44,17 +38,33 @@ class PlayerService {
     @Autowired
     GameConfigurationRepository gameConfigurationRepository
 
+    @Autowired
+    RankingSystemService rankingSystem
+
     static final className = this.class.simpleName
 
     Either<GenericErrorResponse,Player> playerRegister(PlayerDto playerDto) {
         Random random = new Random()
         ArrayList<IntStream> randomNumberGenerator = random.ints(1,0, Integer.MAX_VALUE).findAll()
         String playerId = "player_" + randomNumberGenerator[0].toString()
+
+        Career career = new Career().tap {
+            totalGamesPlayed = 0
+            totalWins = 0
+            totalLoss = 0
+        }
+
+        LeaderBoard leaderBoard = new LeaderBoard().tap {
+            emailId = playerDto.emailId
+            globalRanking = 0.0
+        }
         Player player = new Player().tap {
             pid = playerId
             name = playerDto.name
             emailId = playerDto.emailId
             password = playerDto.password
+            it.career = career
+            it.leaderBoard = leaderBoard
         }
         Player playerResponse
         try {
@@ -195,6 +205,7 @@ class PlayerService {
         if(gameConfiguration.boardSize == currentPlayer.position) {
             moveResponse.gameFinished = true
             gameConfiguration.gameState = Constants.GameState.FINISHED
+            rankingSystem.updateRanks(gameConfiguration, currentPlayer)
         }
 
         int nextMoveSeq = (currentPlayer.seq + 1) % (gameConfiguration.board.playerBoxes.size() + 1);
