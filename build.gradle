@@ -13,6 +13,11 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 }
+jar {
+	manifest {
+		attributes 'Main-Class': 'com.ludo.Snake.and.Ladder.SnakeAndLadderApplication'
+	}
+}
 
 repositories {
 	mavenCentral()
