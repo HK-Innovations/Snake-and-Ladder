@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'SnakeAndLadderBackend'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7FE6E3CD6027458B80A3A766D43AD9D3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6E3466DBB0784AE296B19470973054D8 }}
           package: '*.jar'
