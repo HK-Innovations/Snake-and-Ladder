@@ -110,7 +110,7 @@ class PlayerController {
         return response.get()
     }
 
-    @GetMapping("/career")
+    @PostMapping("/career")
     def getPlayerCareer(@RequestBody Map<String, Object> request) {
         log.info("[$className][getPlayerCareer][Enter]")
         Either<GenericErrorResponse, Career> response = rankingSystemService.getPlayerCareer(request.emailId)
